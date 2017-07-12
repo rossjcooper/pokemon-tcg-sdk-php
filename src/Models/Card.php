@@ -7,7 +7,7 @@ namespace Pokemon\Models;
  *
  * @package Pokemon\Models
  */
-class Card extends Model
+class Card extends Model implements \JsonSerializable
 {
 
     /**
@@ -450,4 +450,18 @@ class Card extends Model
     {
         $this->ancientTrait = $ancientTrait;
     }
+
+	/**
+	 * Specify data which should be serialized to JSON
+	 * @link http://php.net/manual/en/jsonserializable.jsonserialize.php
+	 * @return mixed data which can be serialized by <b>json_encode</b>,
+	 * which is a value of any type other than a resource.
+	 * @since 5.4.0
+	 */
+	function jsonSerialize() {
+		return [
+			'name' => $this->getName(),
+			'imageUrl' => $this->getImageUrl()
+		];
+	}
 }
