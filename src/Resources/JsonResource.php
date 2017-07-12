@@ -32,6 +32,8 @@ class JsonResource implements ResourceInterface
      */
     protected $uri;
 
+    protected $response;
+
     /**
      * Request constructor.
      *
@@ -103,8 +105,69 @@ class JsonResource implements ResourceInterface
      */
     public function all()
     {
-        $data = $this->getResponseData($this->client->send($this->prepare()));
-
+    	$this->send();
+        $data = $this->getResponseData($this->response);
         return $this->transformAll($data);
     }
+
+	/**
+	 * Sends the request and sets response property.
+	 *
+	 * @return $this
+	 */
+	public function send()
+    {
+    	$this->response = $this->client->send($this->prepare());
+    	return $this;
+    }
+
+	/**
+	 * Gets the headers from the response.
+	 * @return mixed
+	 */
+	protected function headers()
+    {
+    	$this->sendIfNotAlready();
+	    return $this->response->getHeaders();
+    }
+
+	/**
+	 * Gets the total number of results from response header.
+	 * @return mixed
+	 */
+	public function total()
+    {
+	    $this->sendIfNotAlready();
+    	return $this->response->getHeader('Total-Count')[0];
+    }
+
+	/**
+	 * Gets the number of results per page from response header.
+	 * @return mixed
+	 */
+	public function perPage()
+	{
+		$this->sendIfNotAlready();
+		return $this->response->getHeader('Count')[0];
+	}
+
+	/**
+	 * Gets the number of pages for all results.
+	 *
+	 * @return float
+	 */
+	public function totalPages()
+	{
+		return ceil($this->total() / $this->perPage());
+	}
+
+	/**
+	 *  Sends the requests if not already sent.
+	 */
+	protected function sendIfNotAlready()
+	{
+		if(!$this->response){
+			$this->send();
+		}
+	}
 }
