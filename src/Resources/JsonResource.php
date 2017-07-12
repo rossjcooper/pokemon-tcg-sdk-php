@@ -158,7 +158,7 @@ class JsonResource implements ResourceInterface
 	 */
 	public function totalPages()
 	{
-		return ceil($this->total() / $this->perPage());
+		return $this->total() == 0 ? 1 : ceil($this->total() / $this->perPage());
 	}
 
 	/**
